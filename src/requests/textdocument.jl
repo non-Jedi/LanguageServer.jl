@@ -83,16 +83,24 @@ function process(r::JSONRPC.Request{Val{Symbol("textDocument/didChange")},DidCha
         error("TextDocumentContentChangeEvent is older than existing Document version.")
     end
     doc._version = r.params.textDocument.version
-    
-    # if length(r.params.contentChanges) == 1
-    #     partial_success = _partial_parse(doc, r.params.contentChanges[1])
-    # end
 
     for tdcce in r.params.contentChanges
+        oldcst = deepcopy(doc.code.cst)
+        editrange = get_offset(doc, tdcce.range)
         applytextdocumentchanges(doc, tdcce)
+        reparsed, oldcst = Reparser.reparse(doc._content, tdcce.text, editrange, oldcst)
+        parse_all(doc, server)
+        if reparsed
+            if !CSTParser.Reparser.isequiv(doc.code.cst, oldcst)
+                @info "Reparse failed: "
+                @info doc.code.cst
+                @info oldcst
+            end
+        else
+            @info "Didnt reparse"
+        end
     end
     doc._line_offsets = nothing
-    parse_all(doc, server)
 end
 
 

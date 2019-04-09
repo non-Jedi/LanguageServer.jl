@@ -7,7 +7,7 @@ import CSTParser
 import SymbolServer
 using CSTParser: TopLevel, Block, Call, FileH, EXPR, UnaryOpCall, UnarySyntaxOpCall, BinaryOpCall, BinarySyntaxOpCall, WhereOpCall, ConditionalOpCall, IDENTIFIER, KEYWORD, LITERAL, OPERATOR, PUNCTUATION, Quotenode, contributes_scope
 import CSTParser.Tokenize.Tokens
-
+using CSTParser.Reparser
 import StaticLint
 
 export LanguageServerInstance
